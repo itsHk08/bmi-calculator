@@ -1,4 +1,6 @@
 <?php
+include 'database.php';
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ?>
@@ -56,48 +58,76 @@ if (isset($_POST['calculate'])) {
     $weight = $_POST['weight'];
     $height = $_POST['height'];
 
-    if ($height > 0) {
+    $bmi = $weight / ($height * $height);
+    $bmi = round($bmi, 2);
 
-        $bmi = $weight / ($height * $height);
-        $bmi = round($bmi, 2);
+    $sql = "INSERT INTO bmi_records(firstname, lastname, age, weight, height, bmi)
+            VALUES('$firstname', '$lastname', '$age', '$weight', '$height', '$bmi')";
 
-        $status = "";
+    mysqli_query($conn, $sql);
 
-        if ($bmi < 18.5) {
-            $status = "Underweight";
-        } elseif ($bmi <= 24.9) {
-            $status = "Normal Weight";
-        } elseif ($bmi <= 29.9) {
-            $status = "Overweight";
-        } else {
-            $status = "Obese";
-        }
+    echo "
+    <div class='result-card'>
 
-        echo "
-        <div class='result-card'>
+        <h1>Latest Result</h1>
 
-            <h1>Results</h1>
+        <div class='result-box'>
 
-            <div class='result-box'>
+            <p><strong>Name:</strong> $firstname $lastname</p>
 
-                <p><strong>First Name:</strong> $firstname</p>
+            <p><strong>Age:</strong> $age</p>
 
-                <p><strong>Last Name:</strong> $lastname</p>
-
-                <p><strong>Age:</strong> $age</p>
-
-                <p><strong>BMI:</strong> $bmi</p>
-
-                <p><strong>Status:</strong> $status</p>
-
-            </div>
+            <p><strong>BMI:</strong> $bmi</p>
 
         </div>
-        ";
-    }
+
+    </div>
+    ";
 }
 
 ?>
+
+</div>
+
+<div class="records">
+
+    <h1>All BMI Records</h1>
+
+    <table>
+
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+            <th>Weight</th>
+            <th>Height</th>
+            <th>BMI</th>
+        </tr>
+
+<?php
+
+$query = "SELECT * FROM bmi_records";
+$result = mysqli_query($conn, $query);
+
+while($row = mysqli_fetch_assoc($result)) {
+
+    echo "
+    <tr>
+        <td>{$row['id']}</td>
+        <td>{$row['firstname']}</td>
+        <td>{$row['lastname']}</td>
+        <td>{$row['age']}</td>
+        <td>{$row['weight']}</td>
+        <td>{$row['height']}</td>
+        <td>{$row['bmi']}</td>
+    </tr>
+    ";
+}
+
+?>
+
+    </table>
 
 </div>
 
